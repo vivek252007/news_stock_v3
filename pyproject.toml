@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "server"
+version = "0.1.0"
+description = "Example to create containerized python app"
+authors = ["Vivek Khajuria <Vivek.Khajuria@target.com>"]
+
+packages = [
+    { include = "data" },
+    { include = "model" },
+    { include = "server" }
+]
+
+#[tool.poetry.scripts]
+#train = "server.model.pipeline"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^8.1"
+Flask = "^2.1.2"
+goose3 = "^3.1.12"
+transformers = "^4.24.0"
+plotly = "^5.11.0"
+dash = "^2.7.1"
+yfinance = "^0.2.3"
+pytz = "^2022.7"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
