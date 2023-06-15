@@ -9,7 +9,8 @@ from config import (
     INTRADAY_INTERVAL,
     TIME_PERIOD,
     TIME_FORMAT,
-    DEFAULT_TIMEZONE
+    DEFAULT_TIMEZONE,
+    NUMBER_OF_TICKER_TO_PROCESS
 )
 from stock_tickers.get_ticker_list import ticker_symbols
 
@@ -21,9 +22,9 @@ class FetchBatchData:
             DEFAULT_TIMEZONE
         )
         self.tickers_data = yf.Tickers(
-            ticker_symbols(top_n=10, return_type="str")
+            ticker_symbols(top_n=NUMBER_OF_TICKER_TO_PROCESS, return_type="str")
         )
-        self.ticker_list = ticker_symbols(top_n=10)
+        self.ticker_list = ticker_symbols(top_n=NUMBER_OF_TICKER_TO_PROCESS)
 
     def stock(self):
         raw_stock_data = self.tickers_data.history(
@@ -47,7 +48,32 @@ class FetchBatchData:
         }
 
 
-# if __name__ == "__main__":
-data_obj = FetchBatchData()
-stock_data = data_obj.stock()
-news_data = data_obj.news()
+if __name__ == "__main__":
+    data_obj = FetchBatchData()
+    stock_data = data_obj.stock()
+    news_data = data_obj.news()
+
+# a = data_obj.tickers_data.news()
+# b = a['AAPL']
+#
+# for news_metadata in b:
+#     news_url = news_metadata["link"]
+#     print("News url: ", news_url)
+#
+# d = {}
+# for ticker in data_obj.ticker_list:
+#     print(ticker)
+#     d[ticker] = data_obj.process_data.process_news_data(a[ticker])
+#
+# from goose3 import Goose
+# import pytz
+#
+# news_url = "https://finance.yahoo.com/news/apple-set-record-high-ahead-100246034.html"
+# for news_metadata in b:
+#     news_url = news_metadata["link"]
+#     print(news_url)
+#     tz = pytz.timezone("America/New_York")
+#     article = Goose().extract(url=news_url)
+#     print(article)
+#     # article.cleaned_text
+#     print(article.publish_datetime_utc.astimezone(tz).strftime("%Y-%m-%d %H:%M:%S"))

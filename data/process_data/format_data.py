@@ -10,6 +10,7 @@ import pytz
 import pandas as pd
 from config import NEWS_TABLE_COLUMNS, STOCK_TABLE_COLUMNS
 
+pd.options.mode.chained_assignment = None #SettingWithCopyWarning
 
 class ProcessData:
     def __init__(self,

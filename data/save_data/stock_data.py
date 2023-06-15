@@ -16,11 +16,12 @@ class SaveStockData:
     def save_stock_data(self):
         try:
             while True:
-                for ticker, stock in self.batch_data.stock():
+                for ticker, stock in self.batch_data.stock().items():
                     print("###########\n" + ticker + " Stock")
-                    print(f"Stock Prices: {stock['date'].iloc[0]} - {stock['date'].iloc[-1]}")
+                    print(f"Stock Prices: {stock['Date_time'].iloc[0]} - {stock['Date_time'].iloc[-1]}")
                     db_handler = DbHandle(ticker, DATABASE_PATH)
-                    db_handler.save_news_data(stock.to_dict("split")["data"])
+                    db_handler.save_stock_data(stock.to_dict("split")["data"])
+                sleep(180)
 
         except Exception as e:
             print(f"Save Stock Data: {e}")

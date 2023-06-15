@@ -1,6 +1,7 @@
 
 
 TICKER_PATH = "data/stock_tickers/sp_500_with_sector.csv"
+NUMBER_OF_TICKER_TO_PROCESS = 200
 DATABASE_PATH = r"data/dbs/news_data.db"
 PREDICTION_DATABASE_PATH = r"data/dbs/model_predictions.db"
 INTRADAY_INTERVAL = "1m"
@@ -28,7 +29,11 @@ STOCK_TABLE_COLUMNS = ['Date_time',
                        'Stock_splits',
                        'Timezone']
 
-PREDICTION_COLUMNS = ['Title_neg_senti',
+PREDICTION_COLUMNS = ['Date_time',
+                      'Title',
+                      'Text',
+                      'News_url',
+                      'Title_neg_senti',
                       'Title_pos_senti',
                       'Text_neg_senti',
                       'Text_pos_senti']

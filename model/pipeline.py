@@ -3,26 +3,29 @@ from os import path
 
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from data.data_api import GetData
-from .define_model import SentimentExtractor
+from data.data_api import DataAPI
+from define_model import SentimentExtractor
 
 
 class ModelPipeline():
     def __init__(self):
-        self.get_save_data = GetData()
         self.sentiment_ext = SentimentExtractor()
 
     def live_stream(self, ticker_symbl):
-        stock_data, news_data = self.get_save_data.live_ticker_data(ticker_symbl)
+        get_save_data = DataAPI(ticker_symbl)
+        news_data = get_save_data.live_news_data()
+        stock_data = get_save_data.live_stock_data()
         return stock_data, self.sentiment_ext.get_sentiment_values(news_data, process_desc=False)
 
+    @staticmethod
     def historical_feed(self, ticker_symbl):
-        return self.get_save_data.historical_stock_data(ticker_symbl), \
-            self.get_save_data.historical_news_data(ticker_symbl)
+        return DataAPI.historical_stock_data(ticker_symbl), \
+            DataAPI.historical_news_data(ticker_symbl)
 
+    @staticmethod
     def historical_predictions(self, ticker_symbl):
-        return self.get_save_data.historical_stock_data(ticker_symbl), \
-            self.get_save_data.historical_prediction_data(ticker_symbl)
+        return DataAPI.historical_stock_data(ticker_symbl), \
+            DataAPI.historical_prediction_data(ticker_symbl)
 
     @staticmethod
     def stock_post_processing(stock_df):
@@ -44,9 +47,9 @@ class ModelPipeline():
 if __name__ == "__main__":
     # poetry run python -i model/pipeline.py
     mp = ModelPipeline()
-    # a, b = mp.live_stream("MMM")
-    # c, d = mp.historical_feed("MMM")
-    e, f = mp.historical_predictions("AAPL")
+    a, b = mp.live_stream("AAPL")
+    # c, d = mp.historical_feed("AAPL")
+    # e, f = mp.historical_predictions("AAPL")
 # import pickle
 # with open("news_data", "wb") as handle:
 #     pickle.dump(f, handle)

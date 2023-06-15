@@ -16,14 +16,15 @@ class SaveNewsData:
     def save_news_data(self):
         try:
             while True:
-                for ticker, news in self.batch_data.news():
+                for ticker, news in self.batch_data.news().items():
                     print("###########\n" + ticker + " News")
                     print(f"News Articles Count: {len(news)}")
                     db_handler = DbHandle(ticker, DATABASE_PATH)
                     db_handler.save_news_data(news.to_dict("split")["data"])
+                sleep(900)
 
         except Exception as e:
-            print(f"Save News Data: {e}")
+            print(f"Save News Data for {ticker}: {e}")
             self.handle_crash()
 
     def handle_crash(self):

@@ -12,13 +12,13 @@ class SqlQueries:
                                             High text,
                                             Low text,
                                             Close text,
-                                            Volume text
+                                            Volume text,
                                             Dividends text,
                                             Stock_splits text,
                                             Timezone text
                                       ); '''
 
-        self.insert_stock_table = f'''INSERT OR REPLACE INTO {self.ticker}_stock VALUES(?,?,?,?,?,?)'''
+        self.insert_stock_table = f'''INSERT OR REPLACE INTO {self.ticker}_stock VALUES(?,?,?,?,?,?,?,?,?)'''
 
         self.get_stock_data_query = f"SELECT * FROM {self.ticker}_stock"
 
@@ -27,14 +27,14 @@ class SqlQueries:
                                                 Date_time text NOT NULL,
                                                 Title text,
                                                 Text text,
-                                                News_url text PRIMARY KEY
-                                                Related_tickers text,                                                Title text,
-                                                Publisher text,                                                Title text,
-                                                News_type text,                                                Title text,
-                                                Timezone text,
+                                                News_url text PRIMARY KEY,
+                                                Related_tickers text,
+                                                Publisher text,
+                                                News_type text,
+                                                Timezone text
                                             ); '''
 
-        self.insert_news_table = f'''INSERT OR REPLACE INTO {self.ticker}_news VALUES(?,?,?,?) '''
+        self.insert_news_table = f'''INSERT OR REPLACE INTO {self.ticker}_news VALUES(?,?,?,?,?,?,?,?)'''
 
         self.get_news_data_query = f'''SELECT * FROM {self.ticker}_news'''
 
