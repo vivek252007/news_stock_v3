@@ -3,12 +3,16 @@
 import sys
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
 from goose3 import Goose
 import pytz
 import pandas as pd
-from config import NEWS_TABLE_COLUMNS, STOCK_TABLE_COLUMNS
+from data.config import NEWS_TABLE_COLUMNS, STOCK_TABLE_COLUMNS
 
 pd.options.mode.chained_assignment = None #SettingWithCopyWarning
 

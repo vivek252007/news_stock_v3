@@ -139,7 +139,7 @@ source, vbar_mean, x_axis_override = get_processed_data(stock_df, news_df)
 plot = plot_obj(source, vbar_mean, x_axis_override)
 from bokeh.models import Dropdown
 
-menu = pd.read_csv("../data/stock_tickers/sp_500_with_sector.csv")[["Description", "Symbol"]][:10].to_dict("split")["data"]
+menu = pd.read_csv("../../data/stock_tickers/sp_500_with_sector.csv")[["Description", "Symbol"]][:10].to_dict("split")["data"]
 # menu = [("Item 1", "item_1"), ("Item 2", "item_2"), ("Item 3", "item_3")]
 
 dropdown = Dropdown(label="Select Stock", button_type="warning", menu=menu)

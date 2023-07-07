@@ -1,11 +1,16 @@
 import sys
 from os import path
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 
-from db_utils.queries import SqlQueries
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
+
+from data.db_utils.queries import SqlQueries
 import pandas as pd
-from db_utils.conn_api import ConnAPI
-from config import (
+from data.db_utils.conn_api import ConnAPI
+from data.config import (
     STOCK_TABLE_COLUMNS,
     NEWS_TABLE_COLUMNS,
     PREDICTION_COLUMNS
@@ -77,7 +82,7 @@ class DbHandle:
             data = self.db_conn.get_data(self.sql_queries.get_sentiment_data_query)
             return pd.DataFrame(
                 data,
-                columns=NEWS_TABLE_COLUMNS + PREDICTION_COLUMNS
+                columns=PREDICTION_COLUMNS
             ) if return_df else data
         else:
             print("Error! cannot retrieve data from the news data table")

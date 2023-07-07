@@ -1,10 +1,12 @@
-import torch
+# import torch
+import tensorflow as tf
 from transformers import (
     AutoTokenizer,
-    AutoModelForSequenceClassification,
-    BartTokenizer,
-    BartForConditionalGeneration
+    TFAutoModelForSequenceClassification,
+    TFBartForConditionalGeneration
 )
+
+from model.config import *
 import pandas as pd
 from tqdm import tqdm
 
@@ -13,38 +15,27 @@ tqdm.pandas()
 
 class SentimentExtractor():
     def __init__(self):
-        self._summarization_model_params()
-        self._text_classification_params()
-        self.summary_tokenizer = BartTokenizer.from_pretrained(self.summary_model_name)
-        self.summary_model= BartForConditionalGeneration.from_pretrained(self.summary_model_name)
-        self.classify_tokenizer = AutoTokenizer.from_pretrained(self.classify_tokenizer_name)
-        self.classify_model = AutoModelForSequenceClassification.from_pretrained(self.classify_model_name)
-        self.class_labels = [-1, 1]  # class labels are index 0:Negative 1:Positive
+        self.classify_tokenizer = AutoTokenizer.from_pretrained(CLASSIFY_TOKENIZER_NAME)
+        self.classify_model = TFAutoModelForSequenceClassification.from_pretrained(CLASSIFY_MODEL_NAME)
+        self.class_labels = [-1.0, 1.0]  # class labels are index 0:Negative 1:Positive
         self.sentiment_value_round = 4
 
-    def _summarization_model_params(self):
-        self.tokenizer_max_length = 1024
-        self.summary_model_name = "facebook/bart-large-cnn"
-        self.summary_max_length = 130
-        self.summary_min_length = 30
-        self.num_beams = 4
-
-    def _text_classification_params(self):
-        self.classify_tokenizer_name = "distilbert-base-uncased-finetuned-sst-2-english"
-        self.classify_model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+    def _init_summary_model(self):
+        self.summary_tokenizer = AutoTokenizer.from_pretrained(SUMMARY_MODEL_NAME)
+        self.summary_model = TFBartForConditionalGeneration.from_pretrained(SUMMARY_MODEL_NAME)
 
     def summarization_model(self, text_article):
         inputs = self.summary_tokenizer(
             text_article,
-            max_length=self.tokenizer_max_length,
-            return_tensors="pt",
+            max_length=TOKENIZER_MAX_LENGTH,
+            return_tensors="tf",
             truncation=True
         )
         summary_ids = self.summary_model.generate(
             inputs["input_ids"],
-            num_beams=self.num_beams,
-            min_length=self.summary_min_length,
-            max_length=self.summary_max_length
+            num_beams=NUM_BEAMS,
+            min_length=SUMMARY_MIN_LENGTH,
+            max_length=SUMMARY_MAX_LENGTH
         )
 
         return self.summary_tokenizer.batch_decode(
@@ -54,34 +45,46 @@ class SentimentExtractor():
         )[0]
 
     def text_classification_model(self, text_summary):
-        inputs = self.classify_tokenizer(text_summary, return_tensors="pt")
-        with torch.no_grad():
-            logits = self.classify_model(**inputs).logits
+        inputs = self.classify_tokenizer(text_summary, return_tensors="tf")
+        logits = self.classify_model(**inputs).logits
+        softmax_prob = tf.math.multiply(
+            tf.nn.softmax(logits, axis=-1),
+            tf.constant(self.class_labels)).numpy().tolist()[0]
 
-        softmax_prob = torch.nn.Softmax(dim=0)
-        # pred_class = self.classify_model.config.id2label[logits.argmax().item()]
         return [round(element, self.sentiment_value_round)
-                for element in softmax_prob(logits[0]) \
-                    .mul(torch.tensor(self.class_labels)) \
-                    .tolist()
+                for element in softmax_prob
                 ]
+
+        # predicted_class_id = int(tf.math.argmax(logits, axis=-1)[0])
+        # pred_class = self.classify_model.config.id2label[predicted_class_id]
+        # with torch.no_grad():
+        #     logits = self.classify_model(**inputs).logits
+        #
+        # softmax_prob = torch.nn.Softmax(dim=0)
+        # # pred_class = self.classify_model.config.id2label[logits.argmax().item()]
+        # return [round(element, self.sentiment_value_round)
+        #         for element in softmax_prob(logits[0]) \
+        #             .mul(torch.tensor(self.class_labels)) \
+        #             .tolist()
+        #         ]
 
     def get_sentiment_values(self, news_df, process_desc=True):
 
         headline_sentiment = pd.DataFrame(
-            news_df["headline"].progress_apply(
+            news_df["Title"].progress_apply(
                 lambda x: self.text_classification_model(x)
             ).tolist(), index=news_df.index) \
-            .rename(columns={0: 'headline_negative', 1: 'headline_positive'})
+            .rename(columns={0: 'title_negative', 1: 'title_positive'})
 
         # TODO: It truncates the description, the max text(token) length is 1024
         if process_desc:
+            self._init_summary_model()
             description_sentiment = pd.DataFrame(
-                news_df["description"].progress_apply(
+                news_df["Text"].progress_apply(
                     lambda x: self.text_classification_model(
                         self.summarization_model(x))
                 ).tolist(), index=news_df.index) \
-                .rename(columns={0: 'description_negative', 1: 'description_positive'})
+                .rename(columns={0: 'text_negative', 1: 'text_positive'})
 
             return pd.concat([news_df, headline_sentiment, description_sentiment], axis=1)
         else:
@@ -104,6 +107,5 @@ if __name__ == "__main__":
     # sentiments = [sentiment_ext.text_classification_model(summary) for summary in summaries]
     sentiment = sentiment_ext.text_classification_model(summary)
     # print(sentiments)
-    print(summary)
-    print(sentiment)
-
+    # print(summary)
+    # print(sentiment)

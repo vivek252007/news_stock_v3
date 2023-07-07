@@ -1,10 +1,11 @@
 import sys
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.abspath(__file__)))
+sys.path.append(parentdir)
 
 from data.data_api import DataAPI
-from define_model import SentimentExtractor
+from model.define_model import SentimentExtractor
 
 
 class ModelPipeline():
@@ -18,29 +19,29 @@ class ModelPipeline():
         return stock_data, self.sentiment_ext.get_sentiment_values(news_data, process_desc=False)
 
     @staticmethod
-    def historical_feed(self, ticker_symbl):
+    def historical_feed(ticker_symbl):
         return DataAPI.historical_stock_data(ticker_symbl), \
             DataAPI.historical_news_data(ticker_symbl)
 
     @staticmethod
-    def historical_predictions(self, ticker_symbl):
+    def historical_predictions(ticker_symbl):
         return DataAPI.historical_stock_data(ticker_symbl), \
             DataAPI.historical_prediction_data(ticker_symbl)
 
     @staticmethod
     def stock_post_processing(stock_df):
-        stock_data = stock_df[["date", "close"]].to_dict("list")
-        s_date, s_price = stock_data["date"], stock_data["close"]
+        stock_data = stock_df[["Date_time", "Close"]].to_dict("list")
+        s_date, s_price = stock_data["Date_time"], stock_data["Close"]
         return s_date, s_price
 
     @staticmethod
     def news_post_processing(prediction_df):
-        prediction_data = prediction_df[["date", "headline", "link",
-                                         "headline_neg_sentiment",
-                                         "headline_pos_sentiment"]].to_dict("list")
-        n_date, n_head, n_link, n_neg, n_pos = prediction_data["date"], \
-            prediction_data["headline"], prediction_data["link"], \
-            prediction_data["headline_neg_sentiment"], prediction_data["headline_pos_sentiment"]
+        prediction_data = prediction_df[["Date_time", "Title", "News_url",
+                                         "title_negative",
+                                         "title_positive"]].to_dict("list")
+        n_date, n_head, n_link, n_neg, n_pos = prediction_data["Date_time"], \
+            prediction_data["Title"], prediction_data["News_url"], \
+            prediction_data["title_negative"], prediction_data["title_positive"]
         return n_date, n_head, n_link, n_neg, n_pos
 
 
@@ -48,7 +49,9 @@ if __name__ == "__main__":
     # poetry run python -i model/pipeline.py
     mp = ModelPipeline()
     a, b = mp.live_stream("AAPL")
-    # c, d = mp.historical_feed("AAPL")
+    c, d = mp.historical_feed("AAPL")
+    e = mp.news_post_processing(b)
+    f = mp.stock_post_processing(a)
     # e, f = mp.historical_predictions("AAPL")
 # import pickle
 # with open("news_data", "wb") as handle:

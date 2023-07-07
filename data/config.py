@@ -1,11 +1,11 @@
 
 
 TICKER_PATH = "data/stock_tickers/sp_500_with_sector.csv"
-NUMBER_OF_TICKER_TO_PROCESS = 200
+NUMBER_OF_TICKER_TO_PROCESS = 20
 DATABASE_PATH = r"data/dbs/news_data.db"
 PREDICTION_DATABASE_PATH = r"data/dbs/model_predictions.db"
 INTRADAY_INTERVAL = "1m"
-TIME_PERIOD = "7d"
+TIME_PERIOD = "1d"
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 DEFAULT_TIMEZONE = "America/New_York"
 

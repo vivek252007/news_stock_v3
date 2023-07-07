@@ -2,11 +2,15 @@ import sys
 from time import sleep
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
-from db_utils.db_handle import DbHandle
-from config import DATABASE_PATH
-from process_data.batch_data import FetchBatchData
+from data.db_utils.db_handle import DbHandle
+from data.config import DATABASE_PATH
+from data.process_data.batch_data import FetchBatchData
 
 
 class SaveNewsData:
@@ -33,6 +37,6 @@ class SaveNewsData:
 
 
 if __name__ == "__main__":
-    # poetry run python -i data/news_data.py
+    # poetry run python -i data/save_data/news_data.py
     save_data = SaveNewsData()
     save_data.save_news_data()

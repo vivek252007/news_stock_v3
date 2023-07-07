@@ -2,7 +2,11 @@ import sys
 from time import sleep
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
 from data.db_utils.db_handle import DbHandle
 from data.config import DATABASE_PATH
@@ -24,7 +28,7 @@ class SaveStockData:
                 sleep(180)
 
         except Exception as e:
-            print(f"Save Stock Data: {e}")
+            print(f"Error Save Stock Data: {e}")
             self.handle_crash()
 
     def handle_crash(self):
@@ -33,6 +37,6 @@ class SaveStockData:
 
 
 if __name__ == "__main__":
-    # poetry run python -i data/stock_data.py
+    # poetry run python -i data/save_data/stock_data.py
     save_data = SaveStockData()
     save_data.save_stock_data()

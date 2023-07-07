@@ -1,14 +1,18 @@
 import sys
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.abspath(__file__)))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
 try:
     from data.process_data.live_data import FetchLiveData
 except ImportError:
     from process_data.live_data import FetchLiveData
 
-from db_utils.db_handle import DbHandle
+from data.db_utils.db_handle import DbHandle
 from data.process_data.live_data import FetchLiveData
 from data.config import DATABASE_PATH, PREDICTION_DATABASE_PATH
 
@@ -56,7 +60,8 @@ class DataAPI:
 if __name__ == "__main__":
     #     poetry run python -i data/data_api.py
     get_save_data = DataAPI("AAPL")
-    # get_save_data.historical_stock_data()
-    # get_save_data.historical_news_data()
-    get_save_data.live_news_data()
-    get_save_data.live_stock_data()
+    # DataAPI.historical_stock_data("AAPL")
+    # DataAPI.historical_news_data("AAPL")
+    # DataAPI.historical_prediction_data("AAPL")
+    a = get_save_data.live_news_data()
+    b = get_save_data.live_stock_data()

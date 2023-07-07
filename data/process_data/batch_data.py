@@ -1,18 +1,22 @@
 import sys
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
 import yfinance as yf
-from process_data.format_data import ProcessData
-from config import (
+from data.process_data.format_data import ProcessData
+from data.config import (
     INTRADAY_INTERVAL,
     TIME_PERIOD,
     TIME_FORMAT,
     DEFAULT_TIMEZONE,
     NUMBER_OF_TICKER_TO_PROCESS
 )
-from stock_tickers.get_ticker_list import ticker_symbols
+from data.stock_tickers.get_ticker_list import ticker_symbols
 
 
 class FetchBatchData:

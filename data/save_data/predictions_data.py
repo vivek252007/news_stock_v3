@@ -5,7 +5,11 @@ import pandas as pd
 from tqdm import tqdm
 
 tqdm.pandas()
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
 from data.db_utils.db_handle import DbHandle
 from model.define_model import SentimentExtractor
@@ -19,12 +23,12 @@ class GetSavePredictions:
         self.ticker_list = ticker_symbols()
 
     def _process_new_news(self, data_db_handle, pred_db_handle):
-        hist_news_df = data_db_handle.process_news_data()
+        hist_news_df = data_db_handle.get_news_data()
 
         try:
-            processed_news_df = pred_db_handle.get_prediction_data()[["link"]]
+            processed_news_df = pred_db_handle.get_prediction_data()[["News_url"]]
             unprocessed_news_df = pd.concat([hist_news_df, processed_news_df]) \
-                .drop_duplicates(subset=["link"], keep=False)
+                .drop_duplicates(subset=["News_url"], keep=False)
         except Exception as e:
             unprocessed_news_df = hist_news_df
             print(f"Process new News: {e}")
@@ -41,7 +45,18 @@ class GetSavePredictions:
                     db_handler = DbHandle(company_ticker, DATABASE_PATH)
                     pred_db_handler = DbHandle(company_ticker, PREDICTION_DATABASE_PATH)
                     model_predictions = self._process_new_news(db_handler, pred_db_handler)
-                    pred_db_handler.save_prediction_data(model_predictions.to_dict("split")["data"])
+                    if not model_predictions.empty:
+                        pred_db_handler.save_prediction_data(
+                            model_predictions[['Date_time',
+                                               'Title',
+                                               'Text',
+                                               'News_url',
+                                               'title_negative',
+                                               'title_positive',
+                                               'text_negative',
+                                               'text_positive'
+                                               ]].to_dict("split")["data"]
+                        )
 
                     print(company_ticker + " Prediction Completed\n########################\n\n")
 
@@ -55,7 +70,18 @@ class GetSavePredictions:
 
 
 if __name__ == "__main__":
-    # poetry run python -i data/predictions_data.py
+    # poetry run python -i data/save_data/predictions_data.py
     get_save_data = GetSavePredictions()
     get_save_data.save_prediction_data()
 
+# company_ticker = "AAPL"
+# sentiment_ext = SentimentExtractor()
+# DATABASE_PATH = r"data/dbs/news_data.db"
+# PREDICTION_DATABASE_PATH = r"data/dbs/model_predictions.db"
+# db_handler = DbHandle(company_ticker, DATABASE_PATH)
+# pred_db_handler = DbHandle(company_ticker, PREDICTION_DATABASE_PATH)
+# hist_news_df = db_handler.get_news_data()
+# processed_news_df = pred_db_handler.get_prediction_data()[["News_url"]]
+# unprocessed_news_df = pd.concat([hist_news_df, processed_news_df]) \
+#     .drop_duplicates(subset=["News_url"], keep=False)
+# hist_news_with_sentiment = sentiment_ext.get_sentiment_values(unprocessed_news_df)

@@ -1,10 +1,14 @@
 import sys
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
 import yfinance as yf
-from process_data.format_data import ProcessData
+from data.process_data.format_data import ProcessData
 from data.config import (
     INTRADAY_INTERVAL,
     TIME_PERIOD,

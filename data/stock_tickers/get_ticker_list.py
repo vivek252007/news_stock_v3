@@ -1,10 +1,14 @@
 import sys
 from os import path
 
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+parentdir = path.dirname(path.dirname(path.dirname(path.abspath(__file__))))
+sys.path.append(parentdir)
+# sys.path.append(os.path.join(parentdir, "data"))
+# sys.path.append(os.path.join(parentdir, "model"))
+# sys.path.append(os.path.join(parentdir, "server"))
 
 import pandas as pd
-from config import TICKER_PATH
+from data.config import TICKER_PATH
 
 
 def ticker_symbols(top_n=500, return_type="list"):
