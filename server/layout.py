@@ -1,4 +1,13 @@
 from dash import dcc, html
+import pandas as pd
+import re
+
+ticker_list = [{'label': name, 'value': ticker}
+               for ticker, name in list(
+        pd.read_csv("data/stock_tickers/sp_500_with_sector.csv")[["Symbol", "Description"]]
+        .head(20)
+        .apply(lambda x: (x.Symbol, re.sub(' +', ' ', re.sub("Inc\.?", "",x.Description.replace("Class", "").strip()))), axis=1)
+    )]
 
 div_style = {'font-family': 'Courier New',
              'width': '400px',
@@ -6,19 +15,14 @@ div_style = {'font-family': 'Courier New',
              'padding': '10px'}
 
 dash_layout = html.Div([
-    html.H1('Sentiment Analysis', style = {'font-family': 'Verdana', 'color': 'SlateBlue'}),
+    html.H1('Sentiment Analysis', style={'font-family': 'Verdana', 'color': 'SlateBlue'}),
 
     html.Div(
         [
-            html.H4("Stock",  style={'margin-right': '2em'}),
+            html.H4("Stock", style={'margin-right': '2em'}),
             dcc.Dropdown(
                 id="ticker",
-                options=[
-                    {'label': 'Apple', 'value': 'AAPL'},
-                    {'label': 'Google', 'value': 'GOOG'},
-                    {'label': 'Microsoft', 'value': 'MSFT'},
-                    {'label': 'Tesla', 'value': 'TSLA'},
-                ],
+                options=ticker_list,
                 value="AAPL",
                 clearable=False,
                 style=dict(
@@ -30,7 +34,18 @@ dash_layout = html.Div([
     ),
     html.Div(
         [
-            html.H4("Period",  style={'margin-right': '2em'}),
+            html.H4("Chart Type", style={'margin-right': '2em'}),
+            dcc.RadioItems(
+                id="chart_type",
+                options=["Live", "Historical"],
+                value="Live",
+            )
+        ],
+        style=div_style
+    ),
+    html.Div(
+        [
+            html.H4("Period", style={'margin-right': '2em'}),
             dcc.Dropdown(
                 id="period",
                 options=[
@@ -48,17 +63,6 @@ dash_layout = html.Div([
         ],
         style=div_style
     ),
-    html.Div(
-        [
-            html.H4("Chart Type",  style={'margin-right': '2em'}),
-            dcc.RadioItems(
-                id="chart_type",
-                options=["Live", "Historical"],
-                value="Live",
-            )
-        ],
-        style=div_style
-    ),
     dcc.Interval(
         id='interval-component',
         interval=10 * 1000,  # in milliseconds
@@ -67,6 +71,7 @@ dash_layout = html.Div([
     dcc.Graph(id="live-update-graph"),
 ]
 )
+
 
 def update_fig_layout(fig):
     fig.update_layout(
@@ -80,6 +85,7 @@ def update_fig_layout(fig):
             family="Courier New, monospace",
             size=16,
             color="RebeccaPurple"
-        )
+        ),
+        uirevision=True
     )
     return fig

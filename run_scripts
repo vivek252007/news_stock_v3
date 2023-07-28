@@ -1,0 +1,4 @@
+poetry run python -i server/app.py
+poetry run python data/save_data/stock_data.py
+poetry run python data/save_data/news_data.py
+poetry run python data/save_data/predictions_data.py
