@@ -9,11 +9,9 @@ from process_data import get_processed_data, set_color, get_data
 import plotly.graph_objects as go
 from dash import Dash, Input, Output, callback, ctx
 from plotly.subplots import make_subplots
-from dash.exceptions import PreventUpdate
 import webbrowser
 
 from model.pipeline import ModelPipeline
-import pandas as pd
 environ["TOKENIZERS_PARALLELISM"] = "false"
 
 app = Dash(__name__)
